@@ -5,8 +5,9 @@
 -- Drop trigger if it already exists
 drop trigger if exists on_auth_user_created on auth.users;
 
--- Drop function if it already exists
+-- Drop functions if they exist
 drop function if exists public.handle_new_user();
+drop function if exists public.is_admin();
 
 -- Drop existing policies if they exist (to avoid "already exists" errors)
 drop policy if exists "Users can view own profile" on public.profiles;
@@ -32,7 +33,25 @@ create table if not exists public.profiles (
 alter table public.profiles enable row level security;
 
 -- =========================================
--- 3) RLS POLICIES (RECREATE CLEANLY)
+-- 3) HELPER FUNCTION TO PREVENT RECURSION
+-- =========================================
+
+create or replace function public.is_admin()
+returns boolean as $$
+declare
+  user_role text;
+begin
+  select role into user_role
+  from public.profiles
+  where id = auth.uid()
+  limit 1;
+  
+  return user_role = 'admin';
+end;
+$$ language plpgsql security definer;
+
+-- =========================================
+-- 4) RLS POLICIES (RECREATE CLEANLY)
 -- =========================================
 
 -- 1. Users can view their own profile
@@ -41,44 +60,38 @@ on public.profiles
 for select
 using (auth.uid() = id);
 
--- 2. Admins can view all profiles
-create policy "Admins can view all profiles"
-on public.profiles
-for select
-using (
-  exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role = 'admin'
-  )
-);
-
--- 3. Admins can update any profile (role, can_use_ai)
-create policy "Admins can update profiles"
-on public.profiles
-for update
-using (
-  exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role = 'admin'
-  )
-)
-with check (true);
-
--- 4. Users can INSERT their own profile (very important for trigger insert)
+-- 2. Users can INSERT their own profile (very important for trigger insert)
 create policy "Users can insert their own profile"
 on public.profiles
 for insert
 with check (auth.uid() = id);
 
--- 5. Users can UPDATE their own profile only
+-- 3. Users can UPDATE their own profile (email, updated_at only)
 create policy "Users can update own profile"
 on public.profiles
 for update
 using (auth.uid() = id)
 with check (auth.uid() = id);
 
+-- 4. Admins can view all profiles (using function to prevent recursion)
+create policy "Admins can view all profiles"
+on public.profiles
+for select
+using (
+  auth.uid() = id  -- Can always see own profile
+  OR 
+  public.is_admin()  -- Or is an admin
+);
+
+-- 5. Admins can update any profile (role, can_use_ai)
+create policy "Admins can update profiles"
+on public.profiles
+for update
+using (public.is_admin())
+with check (true);
+
 -- =========================================
--- 4) TRIGGER FUNCTION (CREATE/REPLACE)
+-- 5) TRIGGER FUNCTION (CREATE/REPLACE)
 -- =========================================
 
 create or replace function public.handle_new_user()
@@ -91,7 +104,7 @@ end;
 $$ language plpgsql security definer;
 
 -- =========================================
--- 5) TRIGGER (CREATE/REPLACE)
+-- 6) TRIGGER (CREATE/REPLACE)
 -- =========================================
 
 create trigger on_auth_user_created

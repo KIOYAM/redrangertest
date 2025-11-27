@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Sparkles, LogOut, Settings } from 'lucide-react'
+import { Sparkles, LogOut, Settings, FolderOpen, Wand2, User } from 'lucide-react'
 
 export default async function AppLayout({
     children,
@@ -36,6 +36,24 @@ export default async function AppLayout({
                         <span>PromptGen</span>
                     </Link>
                     <nav className="ml-auto flex items-center gap-4">
+                        <Link href="/projects">
+                            <Button variant="ghost" size="sm">
+                                <FolderOpen className="mr-2 h-4 w-4" />
+                                Projects
+                            </Button>
+                        </Link>
+                        <Link href="/prompt-builder">
+                            <Button variant="ghost" size="sm">
+                                <Wand2 className="mr-2 h-4 w-4" />
+                                Prompt Builder
+                            </Button>
+                        </Link>
+                        <Link href="/profile">
+                            <Button variant="ghost" size="sm">
+                                <User className="mr-2 h-4 w-4" />
+                                Profile
+                            </Button>
+                        </Link>
                         {isAdmin && (
                             <Link href="/admin/users">
                                 <Button variant="ghost" size="sm">
