@@ -8,61 +8,67 @@ interface PageHeaderProps {
     title: string
     description?: string
     icon?: LucideIcon
-    iconColor?: string
+    iconColor?: 'red' | 'cyan' | 'gold'
     className?: string
     children?: ReactNode
 }
 
 /**
- * Consistent page header component for all pages
+ * Professional page header with strong typography and clean design
  */
 export function PageHeader({ 
     title, 
     description, 
     icon: Icon,
-    iconColor = 'text-purple-400',
+    iconColor = 'red',
     className = '',
     children
 }: PageHeaderProps) {
+    const iconConfig = {
+        red: {
+            bg: 'bg-[#FF003D]/10',
+            icon: 'text-[#FF003D]',
+            gradient: 'from-[#FF003D] via-[#FF4D6D] to-[#FF003D]'
+        },
+        cyan: {
+            bg: 'bg-[#00C4FF]/10',
+            icon: 'text-[#00C4FF]',
+            gradient: 'from-[#00C4FF] via-[#4DD4FF] to-[#00C4FF]'
+        },
+        gold: {
+            bg: 'bg-[#FFC700]/10',
+            icon: 'text-[#FFC700]',
+            gradient: 'from-[#FFC700] via-[#FFD84D] to-[#FFC700]'
+        }
+    }
+
+    const config = iconConfig[iconColor]
+
     return (
         <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`mb-12 text-center ${className}`}
+            className={`mb-16 text-center ${className}`}
         >
             {Icon && (
                 <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", duration: 0.6 }}
-                    className="mb-4 inline-flex"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", duration: 0.6, bounce: 0.3 }}
+                    className="mb-6 inline-flex"
                 >
-                    <div className={`rounded-full bg-gradient-to-r p-4 shadow-lg ${
-                        iconColor.includes('red') || iconColor.includes('yellow') 
-                            ? 'from-red-600/20 to-yellow-600/20' 
-                            : iconColor.includes('green') || iconColor.includes('emerald')
-                            ? 'from-green-600/20 to-emerald-600/20'
-                            : iconColor.includes('cyan')
-                            ? 'from-cyan-600/20 to-blue-600/20'
-                            : 'from-purple-600/20 to-blue-600/20'
-                    }`}>
-                        <Icon className={`h-8 w-8 ${iconColor}`} />
+                    <div className={`rounded-2xl ${config.bg} p-4 border border-white/[0.08] shadow-lg`}>
+                        <Icon className={`h-8 w-8 ${config.icon}`} />
                     </div>
                 </motion.div>
             )}
 
-            <h1 className={`text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent ${
-                iconColor.includes('red') || iconColor.includes('yellow')
-                    ? 'bg-gradient-to-r from-red-500 via-yellow-500 to-red-500'
-                    : iconColor.includes('cyan')
-                    ? 'bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400'
-                    : 'bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400'
-            }`}>
+            <h1 className={`text-5xl md:text-6xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${config.gradient}`}>
                 {title}
             </h1>
 
             {description && (
-                <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                <p className="text-[#B3B3B8] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
                     {description}
                 </p>
             )}

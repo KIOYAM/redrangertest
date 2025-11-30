@@ -60,7 +60,7 @@ export default function MyEnergyPage() {
                     title="⚡ My Morphin Energy ⚡"
                     description="Power up your AI tools with energy"
                     icon={Zap}
-                    iconColor="text-yellow-400"
+                    iconColor="gold"
                 />
 
                 {/* Main Energy Display */}
@@ -166,7 +166,7 @@ export default function MyEnergyPage() {
                             </div>
                             <h3 className="text-lg font-semibold text-white mb-2">Use AI Tools</h3>
                             <p className="text-gray-400 text-sm">
-                                Each AI tool requires Morphin Energy to generate results
+                                Each AI tool requires Morphin Energy to generate prompts
                             </p>
                         </div>
 

@@ -1,17 +1,26 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Zap, Code2, Mail, FileText, Palette } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import {
+    Zap, Code2, Mail, FileText, Palette, Star, ArrowRight,
+    Book, ClipboardList, Projector, Search, Settings, Bug, User, Linkedin, Presentation,
+    GraduationCap, Languages, Calculator, PenTool, Brain, Library,
+    Image, Music, Video, Instagram, Twitter, Youtube, Mic,
+    Utensils, Dumbbell, Plane, Calendar, Smile, Heart, Home,
+    Server, Database, Shield, Terminal, Workflow, Cpu, Globe,
+    Gem, Crown, Rocket, Sparkles, Trophy
+} from 'lucide-react'
+import Link from 'next/link'
 import type { ToolCategory } from '@/types/ranger-groups'
 
 const TOOL_ICONS: Record<string, any> = {
-    Code2,
-    Mail,
-    FileText,
-    Palette,
-    Zap
+    Code2, Mail, FileText, Palette, Zap,
+    Book, ClipboardList, Projector, Search, Settings, Bug, User, Linkedin, Presentation,
+    GraduationCap, Languages, Calculator, PenTool, Brain, Library,
+    Image, Music, Video, Instagram, Twitter, Youtube, Mic,
+    Utensils, Dumbbell, Plane, Calendar, Smile, Heart, Home,
+    Server, Database, Shield, Terminal, Workflow, Cpu, Globe,
+    Gem, Crown, Rocket, Sparkles, Trophy
 }
 
 interface ToolCardProps {
@@ -21,93 +30,77 @@ interface ToolCardProps {
 }
 
 export function ToolCard({ tool, groupColor, groupName }: ToolCardProps) {
-    const router = useRouter()
-    const IconComponent = TOOL_ICONS[tool.icon || 'Zap']
-
-    const handleLaunch = () => {
-        // Navigate to the tool
-        router.push(tool.route_path)
-    }
+    const IconComponent = TOOL_ICONS[tool.icon || 'Zap'] || Zap
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -5, scale: 1.02 }}
-            className="group relative"
-        >
-            <div
-                className="rounded-2xl border-2 border-gray-700 hover:border-opacity-100 bg-gray-900 p-6 transition-all duration-300 h-full flex flex-col"
+        <Link href={tool.route_path}>
+            <motion.div
+                whileHover={{ y: -8, scale: 1.02 }}
+                className="relative overflow-hidden rounded-2xl p-6 cursor-pointer bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300"
                 style={{
-                    borderColor: groupColor + '40',
-                    ['--group-color' as any]: groupColor
+                    ['--hover-shadow' as any]: `0 20px 60px -10px ${groupColor}50`,
+                    ['--hover-border' as any]: `${groupColor}80`
                 }}
                 onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = groupColor
+                    e.currentTarget.style.boxShadow = `0 20px 60px -10px ${groupColor}50`
+                    e.currentTarget.style.borderColor = `${groupColor}80`
                 }}
                 onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = groupColor + '40'
+                    e.currentTarget.style.boxShadow = 'none'
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
                 }}
             >
-                {/* Featured Badge */}
-                {tool.is_featured && (
-                    <div className="absolute -top-3 -right-3">
-                        <span className="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                            ⭐ FEATURED
-                        </span>
-                    </div>
-                )}
-
-                {/* Tool Icon */}
+                {/* Hover Glow Effect */}
                 <div
-                    className="mb-4 p-4 rounded-lg transition-all duration-300"
+                    className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                     style={{
-                        backgroundColor: groupColor + '20'
+                        background: `radial-gradient(circle at center, ${groupColor}20 0%, transparent 70%)`
                     }}
-                >
-                    <IconComponent
-                        className="h-12 w-12 transition-transform duration-300 group-hover:scale-110"
-                        style={{ color: groupColor }}
-                    />
-                </div>
+                />
 
-                {/* Tool Name */}
-                <h3 className="text-xl font-bold text-white mb-2">
-                    {tool.display_name}
-                </h3>
-
-                {/* Description */}
-                <p className="text-sm text-gray-400 mb-4 flex-1">
-                    {tool.description}
-                </p>
-
-                {/* Footer */}
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
-                    <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-yellow-400" />
-                        <span className="text-sm text-gray-300 font-medium">
-                            {tool.credit_cost} Energy
-                        </span>
+                <div className="relative z-10 flex flex-col h-full">
+                    <div className="flex items-start justify-between mb-4">
+                        <div
+                            className="w-14 h-14 rounded-xl flex items-center justify-center"
+                            style={{ backgroundColor: `${groupColor}20` }}
+                        >
+                            <IconComponent
+                                className="text-2xl h-7 w-7"
+                                style={{ color: groupColor }}
+                            />
+                        </div>
+                        {tool.is_featured && (
+                            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold border border-yellow-500/30 flex items-center">
+                                <Star className="w-3 h-3 mr-1 fill-yellow-400" />
+                                FEATURED
+                            </span>
+                        )}
                     </div>
 
-                    <Button
-                        className="transition-all duration-300"
-                        style={{
-                            backgroundColor: groupColor,
-                            color: 'white'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = groupColor + 'dd'
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = groupColor
-                        }}
-                        onClick={handleLaunch}
-                    >
-                        Launch
-                    </Button>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                        {tool.display_name}
+                    </h3>
+
+                    <p className="text-gray-400 text-sm mb-6 flex-1">
+                        {tool.description}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+                        <div className="flex items-center space-x-2">
+                            <Zap className="h-4 w-4 text-yellow-400" />
+                            <span className="text-white font-semibold text-sm">
+                                {tool.credit_cost} Energy
+                            </span>
+                        </div>
+                        <div
+                            className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                            style={{ backgroundColor: groupColor }}
+                        >
+                            Use Tool
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </motion.div>
+            </motion.div>
+        </Link>
     )
 }

@@ -66,14 +66,14 @@ export default function OnboardingPage() {
     }
 
     return (
-        <PageWrapper variant="gradient" gradientVariant="purple">
+        <PageWrapper variant="gradient" gradientVariant="red">
             <div className="flex min-h-screen items-center justify-center p-4">
                 <div className="w-full max-w-2xl">
                     <PageHeader
                         title="Welcome to RedRanger! 👋"
                         description="Let's set up your profile to get started"
                         icon={UserCircle}
-                        iconColor="text-purple-400"
+                        iconColor="red"
                     />
 
                     <GlassPanel className="p-8">

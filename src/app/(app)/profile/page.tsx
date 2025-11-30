@@ -104,13 +104,13 @@ export default function ProfilePage() {
     }
 
     return (
-        <PageWrapper variant="gradient" gradientVariant="purple">
+        <PageWrapper variant="gradient" gradientVariant="cyan">
             <div className="mx-auto max-w-3xl px-4 py-12 pt-32">
                 <PageHeader
                     title="My Profile"
                     description="Manage your account settings and preferences"
                     icon={User}
-                    iconColor="text-purple-400"
+                    iconColor="cyan"
                 />
 
                 <GlassPanel className="p-8">

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Forbidden: AI access required' }, { status: 403 })
     }
 
-    const { task, language, tone, format } = await request.json()
+    const { task, language, tone, format, context } = await request.json()
 
     if (!task) {
         return NextResponse.json({ error: 'Task is required' }, { status: 400 })
@@ -38,10 +38,12 @@ export async function POST(request: Request) {
             messages: [
                 {
                     role: 'system',
-                    content: `You are an expert prompt engineer. Create a high-quality prompt based on the user's request.
-          Language: ${language}
-          Tone: ${tone}
-          Format: ${format}`,
+                    content: `You are an expert prompt engineer and AI assistant. 
+          ${context ? `Context: ${context}` : ''}
+          Create a high-quality prompt or response based on the user's request.
+          Language: ${language || 'English'}
+          Tone: ${tone || 'Professional'}
+          Format: ${format || 'Markdown'}`,
                 },
                 {
                     role: 'user',

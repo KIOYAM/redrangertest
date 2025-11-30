@@ -9,7 +9,13 @@ export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname
 
     // Public routes
-    if (path.startsWith('/login') || path.startsWith('/auth')) {
+    if (path === '/' ||
+        path.startsWith('/login') ||
+        path.startsWith('/register') ||
+        path.startsWith('/verify-email') ||
+        path.startsWith('/forgot-password') ||
+        path.startsWith('/auth') ||
+        path.startsWith('/landing')) {
         return NextResponse.next()
     }
 

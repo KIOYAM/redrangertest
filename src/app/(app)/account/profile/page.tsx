@@ -127,7 +127,7 @@ export default function AccountProfilePage() {
                         title="My Profile"
                         description="Manage your personal information and preferences"
                         icon={User}
-                        iconColor="text-cyan-400"
+                        iconColor="cyan"
                     />
 
                     <div className="grid gap-6 lg:grid-cols-3">

@@ -71,7 +71,7 @@ export default function ProjectsPage() {
     }
 
     return (
-        <PageWrapper variant="gradient" gradientVariant="purple">
+        <PageWrapper variant="gradient" gradientVariant="cyan">
             <div className="min-h-screen pt-32 pb-20 px-4">
                 <div className="mx-auto max-w-7xl">
                     {/* Header */}
@@ -79,7 +79,7 @@ export default function ProjectsPage() {
                         title="Your AI Projects"
                         description="Each project has its own isolated AI memory. Create, manage, and organize your AI workflows."
                         icon={Sparkles}
-                        iconColor="text-purple-400"
+                        iconColor="cyan"
                     />
 
                     {/* Create Button */}

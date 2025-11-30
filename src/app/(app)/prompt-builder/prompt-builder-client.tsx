@@ -14,13 +14,13 @@ interface PromptBuilderClientProps {
 
 export function PromptBuilderClient({ profile, profileError, userId }: PromptBuilderClientProps) {
     return (
-        <PageWrapper variant="gradient" gradientVariant="purple">
+        <PageWrapper variant="gradient" gradientVariant="red">
             <div className="mx-auto max-w-7xl px-4 py-12 pt-32 sm:px-6 lg:px-8">
                 <PageHeader
                     title="Prompt Builder Hub"
                     description="Choose a tool to generate the perfect prompt"
                     icon={Sparkles}
-                    iconColor="text-purple-400"
+                    iconColor="red"
                 />
 
                 {profileError && (

@@ -37,14 +37,14 @@ export default function PricingPage() {
     }
 
     return (
-        <PageWrapper variant="gradient" gradientVariant="red">
+        <PageWrapper variant="gradient" gradientVariant="gold">
             <div className="relative container mx-auto px-4 py-16 pt-32">
                 {/* Header */}
                 <PageHeader
                     title="Recharge Your Energy"
                     description="Power up your AI with Morphin Energy cells"
                     icon={Zap}
-                    iconColor="text-yellow-400"
+                    iconColor="gold"
                 >
                     <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-400">
                         <div className="flex items-center gap-2">
@@ -99,8 +99,8 @@ export default function PricingPage() {
 
                                     <div
                                         className={`relative h-full rounded-2xl border-2 ${pkg.is_popular
-                                                ? 'border-yellow-500 bg-gradient-to-br from-yellow-950/50 via-red-950/50 to-black shadow-2xl shadow-yellow-500/20'
-                                                : 'border-red-600/50 bg-gradient-to-br from-gray-900/50 to-black hover:border-red-500'
+                                            ? 'border-yellow-500 bg-gradient-to-br from-yellow-950/50 via-red-950/50 to-black shadow-2xl shadow-yellow-500/20'
+                                            : 'border-red-600/50 bg-gradient-to-br from-gray-900/50 to-black hover:border-red-500'
                                             } p-8 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${pkg.is_popular ? 'scale-105' : ''
                                             }`}
                                     >
@@ -174,8 +174,8 @@ export default function PricingPage() {
                                         <Button
                                             onClick={() => handlePurchase(pkg)}
                                             className={`w-full ${pkg.is_popular
-                                                    ? 'bg-gradient-to-r from-yellow-500 to-red-600 hover:from-yellow-600 hover:to-red-700 text-white'
-                                                    : 'bg-red-600 hover:bg-red-700 text-white'
+                                                ? 'bg-gradient-to-r from-yellow-500 to-red-600 hover:from-yellow-600 hover:to-red-700 text-white'
+                                                : 'bg-red-600 hover:bg-red-700 text-white'
                                                 } font-semibold py-6 text-lg shadow-lg`}
                                         >
                                             <Sparkles className="mr-2 h-5 w-5" />
@@ -204,19 +204,19 @@ export default function PricingPage() {
                             <div className="bg-black/30 rounded-lg p-6">
                                 <div className="text-yellow-400 font-semibold mb-2">Developer Tool</div>
                                 <div className="text-2xl font-bold text-white">10 Energy</div>
-                                <div className="text-sm text-gray-400 mt-1">Per code generation</div>
+                                <div className="text-sm text-gray-400 mt-1">Per prompt generation</div>
                             </div>
 
                             <div className="bg-black/30 rounded-lg p-6">
                                 <div className="text-yellow-400 font-semibold mb-2">Design Tool</div>
                                 <div className="text-2xl font-bold text-white">15 Energy</div>
-                                <div className="text-sm text-gray-400 mt-1">Per image creation</div>
+                                <div className="text-sm text-gray-400 mt-1">Per prompt generation</div>
                             </div>
 
                             <div className="bg-black/30 rounded-lg p-6">
                                 <div className="text-yellow-400 font-semibold mb-2">Content Tool</div>
                                 <div className="text-2xl font-bold text-white">8 Energy</div>
-                                <div className="text-sm text-gray-400 mt-1">Per content piece</div>
+                                <div className="text-sm text-gray-400 mt-1">Per prompt generation</div>
                             </div>
 
                             <div className="bg-black/30 rounded-lg p-6">

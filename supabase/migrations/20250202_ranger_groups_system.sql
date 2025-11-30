@@ -165,45 +165,6 @@ DECLARE
   white_id UUID;
 BEGIN
   SELECT id INTO red_id FROM ranger_groups WHERE name = 'red_ranger';
-  SELECT id INTO blue_id FROM ranger_groups WHERE name = 'blue_ranger';
-  SELECT id INTO yellow_id FROM ranger_groups WHERE name = 'yellow_ranger';
-  SELECT id INTO green_id FROM ranger_groups WHERE name = 'green_ranger';
-  SELECT id INTO black_id FROM ranger_groups WHERE name = 'black_ranger';
-  SELECT id INTO white_id FROM ranger_groups WHERE name = 'white_ranger';
-
-  -- Developer Tool (Work, Learn, Pro)
-  INSERT INTO tool_categories (tool_name, group_id, display_name, description, icon, route_path, credit_cost, display_order, is_featured)
-  VALUES
-    ('developer_tool', red_id, 'Developer', 'Generate optimized code prompts for any programming task', 'Code2', '/groups/work/developer', 10, 1, true),
-    ('developer_tool', blue_id, 'Developer', 'Learn programming with AI-powered code generation', 'Code2', '/groups/learn/developer', 10, 1, false),
-    ('developer_tool', black_id, 'Developer', 'Advanced code generation and architecture', 'Code2', '/groups/pro/developer', 10, 1, false)
-  ON CONFLICT DO NOTHING;
-
-  -- Email Tool (Work, Create)
-  INSERT INTO tool_categories (tool_name, group_id, display_name, description, icon, route_path, credit_cost, display_order)
-  VALUES
-    ('email_tool', red_id, 'Email', 'Professional email templates and responses', 'Mail', '/groups/work/email', 5, 2),
-    ('email_tool', yellow_id, 'Email', 'Creative email campaigns and newsletters', 'Mail', '/groups/create/email', 5, 3)
-  ON CONFLICT DO NOTHING;
-
-  -- Content Tool (Create, Work)
-  INSERT INTO tool_categories (tool_name, group_id, display_name, description, icon, route_path, credit_cost, display_order, is_featured)
-  VALUES
-    ('content_tool', yellow_id, 'Content', 'Generate engaging content for social media and blogs', 'FileText', '/groups/create/content', 8, 1, true),
-    ('content_tool', red_id, 'Content', 'Professional content for business and marketing', 'FileText', '/groups/work/content', 8, 3, false)
-  ON CONFLICT DO NOTHING;
-
-  -- Design Tool (Create, Legendary)
-  INSERT INTO tool_categories (tool_name, group_id, display_name, description, icon, route_path, credit_cost, display_order, is_featured)
-  VALUES
-    ('design_tool', yellow_id, 'Design', 'Create stunning visuals and graphics', 'Palette', '/groups/create/design', 15, 2, true),
-    ('design_tool', white_id, 'Design', 'Premium AI-powered design tools', 'Palette', '/groups/legendary/design', 15, 1, true)
-  ON CONFLICT DO NOTHING;
-
-END $$;
-
--- ============================================
--- 6. HELPER FUNCTIONS
 -- ============================================
 
 -- Function to get all tools in a group

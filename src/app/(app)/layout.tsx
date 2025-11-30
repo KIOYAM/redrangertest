@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { AppNavbar } from '@/components/layout/AppNavbar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 export default async function AppLayout({
     children,
@@ -18,9 +18,9 @@ export default async function AppLayout({
     }
 
     return (
-        <div className="flex min-h-screen flex-col">
-            <AppNavbar />
-            <main className="flex-1 container px-4 md:px-6 mx-auto py-6 mt-20">
+        <div className="flex min-h-screen bg-[#0a0a0a] text-white">
+            <Sidebar user={user} />
+            <main className="flex-1 overflow-y-auto h-screen">
                 {children}
             </main>
         </div>
