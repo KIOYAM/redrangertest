@@ -3,23 +3,28 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { PageWrapper } from '@/components/ui/PageWrapper'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { GlassPanel } from '@/components/ui/GlassPanel'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { User, Save, Shield, CheckCircle, XCircle } from 'lucide-react'
+import { User, Save, Shield, CheckCircle, XCircle, Mail, Briefcase, Sparkles } from 'lucide-react'
 import type { UserProfile, UserType } from '@/types'
 
 const USER_TYPES = [
-    { value: 'student', label: 'Student' },
-    { value: 'employee', label: 'Employee' },
-    { value: 'business', label: 'Business Owner' },
-    { value: 'freelancer', label: 'Freelancer' },
-    { value: 'teacher', label: 'Teacher' },
-    { value: 'hr', label: 'HR Professional' },
-    { value: 'developer', label: 'Developer' },
-    { value: 'other', label: 'Other' }
+    { value: 'student', label: 'Student', icon: '🎓' },
+    { value: 'employee', label: 'Employee', icon: '💼' },
+    { value: 'business', label: 'Business Owner', icon: '🏢' },
+    { value: 'freelancer', label: 'Freelancer', icon: '💻' },
+    { value: 'teacher', label: 'Teacher', icon: '👨‍🏫' },
+    { value: 'hr', label: 'HR Professional', icon: '👥' },
+    { value: 'developer', label: 'Developer', icon: '⚡' },
+    { value: 'other', label: 'Other', icon: '✨' }
 ]
 
 export default function AccountProfilePage() {
@@ -81,23 +86,12 @@ export default function AccountProfilePage() {
 
             const data = await response.json()
             setProfile(data.profile)
-            toast.success('Profile updated successfully')
+            toast.success('Profile updated successfully! ✨')
         } catch (error) {
             toast.error('Failed to update profile')
         } finally {
             setIsSaving(false)
         }
-    }
-
-    if (isLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-center">
-                    <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-                    <p className="text-gray-600">Loading profile...</p>
-                </div>
-            </div>
-        )
     }
 
     const getInitials = (name: string) => {
@@ -109,119 +103,222 @@ export default function AccountProfilePage() {
             .slice(0, 2)
     }
 
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-            <div className="mx-auto max-w-4xl px-4 py-12">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Account Profile</h1>
-                    <p className="mt-2 text-gray-600">Manage your personal information and preferences</p>
+    if (isLoading) {
+        return (
+            <PageWrapper variant="gradient" gradientVariant="cyan">
+                <div className="flex min-h-screen items-center justify-center">
+                    <div className="text-center">
+                        <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-cyan-600/20 border-t-cyan-600" />
+                        <p className="text-gray-300">Loading your profile...</p>
+                    </div>
                 </div>
+            </PageWrapper>
+        )
+    }
 
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Profile Card */}
-                    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="text-center">
-                            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-2xl font-bold text-white">
-                                {profile?.full_name ? getInitials(profile.full_name) : <User className="h-12 w-12" />}
-                            </div>
-                            <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                                {profile?.full_name || 'Unnamed User'}
-                            </h3>
-                            <p className="text-sm text-gray-600">{profile?.email}</p>
+    const selectedUserType = USER_TYPES.find(t => t.value === userType)
 
-                            <div className="mt-6 space-y-3">
-                                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                    <span className="text-sm text-gray-600">Role</span>
-                                    <div className="flex items-center gap-2">
-                                        <Shield className="h-4 w-4 text-blue-600" />
-                                        <span className="font-medium capitalize">{profile?.role}</span>
+    return (
+        <PageWrapper variant="gradient" gradientVariant="cyan">
+            <div className="min-h-screen pt-32 pb-20 px-4">
+                <div className="mx-auto max-w-6xl">
+                    {/* Header */}
+                    <PageHeader
+                        title="My Profile"
+                        description="Manage your personal information and preferences"
+                        icon={User}
+                        iconColor="text-cyan-400"
+                    />
+
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        {/* Profile Card */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="lg:col-span-1"
+                        >
+                            <GlassPanel className="p-8">
+                                <div className="text-center">
+                                    {/* Avatar */}
+                                    <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        className="mx-auto mb-6"
+                                    >
+                                        <div className="relative inline-block">
+                                            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-cyan-600 via-blue-600 to-purple-600 text-3xl font-bold text-white shadow-lg shadow-cyan-500/50">
+                                                {profile?.full_name ? getInitials(profile.full_name) : <User className="h-14 w-14" />}
+                                            </div>
+                                            <div className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 border-4 border-black/40 flex items-center justify-center">
+                                                <Sparkles className="h-4 w-4 text-white" />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+
+                                    <h2 className="text-2xl font-bold text-white mb-1">
+                                        {profile?.full_name || 'Welcome!'}
+                                    </h2>
+                                    <p className="text-sm text-gray-400 mb-6 flex items-center justify-center gap-2">
+                                        <Mail className="h-4 w-4" />
+                                        {profile?.email}
+                                    </p>
+
+                                    {/* Stats */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                                            <span className="text-sm text-gray-400">Role</span>
+                                            <Badge className="bg-gradient-to-r from-blue-600/30 to-purple-600/30 text-cyan-300 border-cyan-500/30 capitalize">
+                                                <Shield className="h-3 w-3 mr-1" />
+                                                {profile?.role}
+                                            </Badge>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                                            <span className="text-sm text-gray-400">AI Access</span>
+                                            {profile?.can_use_ai ? (
+                                                <Badge className="bg-gradient-to-r from-green-600/30 to-emerald-600/30 text-green-300 border-green-500/30">
+                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                    Enabled
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-gray-400 border-gray-600">
+                                                    <XCircle className="h-3 w-3 mr-1" />
+                                                    Disabled
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                                            <span className="text-sm text-gray-400">Status</span>
+                                            {profile?.is_active ? (
+                                                <Badge className="bg-gradient-to-r from-green-600/30 to-emerald-600/30 text-green-300 border-green-500/30">
+                                                    Active
+                                                </Badge>
+                                            ) : (
+                                                <Badge className="bg-gradient-to-r from-red-600/30 to-orange-600/30 text-red-300 border-red-500/30">
+                                                    Inactive
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        {profile?.user_type && (
+                                            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                                                <span className="text-sm text-gray-400">Type</span>
+                                                <Badge className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 text-purple-300 border-purple-500/30">
+                                                    <span className="mr-1">{selectedUserType?.icon}</span>
+                                                    {selectedUserType?.label}
+                                                </Badge>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
+                            </GlassPanel>
+                        </motion.div>
 
-                                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                    <span className="text-sm text-gray-600">AI Access</span>
-                                    {profile?.can_use_ai ? (
-                                        <div className="flex items-center gap-2 text-green-600">
-                                            <CheckCircle className="h-4 w-4" />
-                                            <span className="font-medium">Enabled</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center gap-2 text-gray-400">
-                                            <XCircle className="h-4 w-4" />
-                                            <span className="font-medium">Disabled</span>
-                                        </div>
-                                    )}
+                        {/* Edit Form */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="lg:col-span-2"
+                        >
+                            <GlassPanel className="p-8">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-600/20 to-blue-600/20">
+                                        <Sparkles className="h-6 w-6 text-cyan-400" />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-white">Edit Your Profile</h2>
                                 </div>
 
-                                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                                    <span className="text-sm text-gray-600">Status</span>
-                                    {profile?.is_active ? (
-                                        <span className="font-medium text-green-600">Active</span>
-                                    ) : (
-                                        <span className="font-medium text-red-600">Inactive</span>
-                                    )}
+                                <div className="space-y-6">
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                    >
+                                        <Label className="text-gray-300">Full Name</Label>
+                                        <Input
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            placeholder="Enter your full name"
+                                            className="mt-2 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                                        />
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.4 }}
+                                    >
+                                        <Label className="text-gray-300">I am a...</Label>
+                                        <Select value={userType} onValueChange={(val) => setUserType(val as UserType)}>
+                                            <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {USER_TYPES.map(type => (
+                                                    <SelectItem key={type.value} value={type.value}>
+                                                        <span className="flex items-center gap-2">
+                                                            <span>{type.icon}</span>
+                                                            {type.label}
+                                                        </span>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.5 }}
+                                    >
+                                        <Label className="text-gray-300">Job Role / Title</Label>
+                                        <div className="relative mt-2">
+                                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                            <Input
+                                                value={jobRole}
+                                                onChange={(e) => setJobRole(e.target.value)}
+                                                placeholder="e.g., Frontend Developer, Marketing Manager"
+                                                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                                            />
+                                        </div>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.6 }}
+                                    >
+                                        <Label className="text-gray-300">Email Address</Label>
+                                        <Input
+                                            value={profile?.email || ''}
+                                            disabled
+                                            className="mt-2 bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
+                                        />
+                                        <p className="mt-1 text-xs text-gray-500">🔒 Email cannot be changed</p>
+                                    </motion.div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.7 }}
+                                    >
+                                        <Button
+                                            onClick={handleSave}
+                                            disabled={isSaving}
+                                            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-medium shadow-lg shadow-cyan-500/30"
+                                        >
+                                            <Save className="mr-2 h-4 w-4" />
+                                            {isSaving ? 'Saving...' : 'Save Changes'}
+                                        </Button>
+                                    </motion.div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Edit Form */}
-                    <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm lg:col-span-2">
-                        <h2 className="mb-6 text-xl font-semibold text-gray-900">Edit Profile</h2>
-
-                        <div className="space-y-6">
-                            <div>
-                                <Label htmlFor="fullName">Full Name</Label>
-                                <Input
-                                    id="fullName"
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    placeholder="Enter your full name"
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div>
-                                <Label htmlFor="userType">I am a...</Label>
-                                <Select value={userType} onValueChange={(val) => setUserType(val as UserType)}>
-                                    <SelectTrigger className="mt-2">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {USER_TYPES.map(type => (
-                                            <SelectItem key={type.value} value={type.value}>
-                                                {type.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div>
-                                <Label htmlFor="jobRole">Job Role / Title</Label>
-                                <Input
-                                    id="jobRole"
-                                    value={jobRole}
-                                    onChange={(e) => setJobRole(e.target.value)}
-                                    placeholder="e.g., Frontend Developer, Marketing Manager"
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div>
-                                <Label>Email Address</Label>
-                                <Input value={profile?.email || ''} disabled className="mt-2 bg-gray-50" />
-                                <p className="mt-1 text-sm text-gray-500">Email cannot be changed</p>
-                            </div>
-
-                            <Button onClick={handleSave} disabled={isSaving} className="w-full">
-                                <Save className="mr-2 h-4 w-4" />
-                                {isSaving ? 'Saving...' : 'Save Changes'}
-                            </Button>
-                        </div>
+                            </GlassPanel>
+                        </motion.div>
                     </div>
                 </div>
             </div>
-        </div>
+        </PageWrapper>
     )
 }

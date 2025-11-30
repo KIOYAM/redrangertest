@@ -5,6 +5,7 @@ export interface Project {
     user_id: string
     title: string
     description: string | null
+    tool_name: string
     created_at: string
     updated_at: string
 }
@@ -26,6 +27,7 @@ export interface ProjectWithStats extends Project {
 export interface CreateProjectInput {
     title: string
     description?: string
+    tool_name: string
 }
 
 export interface UpdateProjectInput {

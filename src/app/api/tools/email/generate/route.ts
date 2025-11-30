@@ -4,6 +4,7 @@ import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { buildEmailPrompt } from '@/lib/tools/email/email-prompt-engine'
 import type { EmailContext } from '@/lib/tools/email/email-types'
+import { getProjectMemory, addProjectMemory } from '@/lib/project-memory'
 
 // Initialize AI providers
 const openai = new OpenAI({
@@ -64,7 +65,9 @@ export async function POST(request: Request) {
         story,
         tone,
         length,
-        language
+        language,
+        projectId,
+        toolName
     } = await request.json()
 
     // Only story is required - all other fields are optional
@@ -73,12 +76,35 @@ export async function POST(request: Request) {
     }
 
     // ============================================
-    // 4. BUILD FAULT-TOLERANT PROMPT
+    // 4. HANDLE PROJECT MEMORY (if projectId provided)
+    // ============================================
+    let contextFromMemory = ''
+
+    if (projectId && toolName) {
+        try {
+            // Fetch last 10 messages for context
+            const memory = await getProjectMemory(projectId, {
+                toolName: toolName || 'email',
+                limit: 10
+            })
+
+            if (memory.length > 0) {
+                contextFromMemory = '\n\nPrevious context from this project:\n' +
+                    memory.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n')
+            }
+        } catch (error) {
+            console.error('Failed to fetch project memory:', error)
+            // Continue without context rather than failing
+        }
+    }
+
+    // ============================================
+    // 5. BUILD FAULT-TOLERANT PROMPT
     // ============================================
     try {
         // Build the email context - only story is required
         const emailContext: EmailContext = {
-            story,
+            story: story + contextFromMemory,
             ...(to && { to }),
             ...(fromName && { fromName }),
             ...(receiverType && { receiverType }),
@@ -92,7 +118,7 @@ export async function POST(request: Request) {
         const metaPrompt = buildEmailPrompt(emailContext)
 
         // ============================================
-        // 5. CALL AI PROVIDER
+        // 6. CALL AI PROVIDER
         // ============================================
         let prompt: string | null = null
 
@@ -124,6 +150,21 @@ export async function POST(request: Request) {
             }
 
             prompt = result.response.text()
+        }
+
+        // ============================================
+        // 7. SAVE TO PROJECT MEMORY (if projectId provided)
+        // ============================================
+        if (projectId && toolName && prompt) {
+            try {
+                // Save user prompt
+                await addProjectMemory(projectId, 'user', story, toolName)
+                // Save AI response
+                await addProjectMemory(projectId, 'ai', prompt, toolName)
+            } catch (error) {
+                console.error('Failed to save to project memory:', error)
+                // Don't fail the request if memory save fails
+            }
         }
 
         return NextResponse.json({ prompt })

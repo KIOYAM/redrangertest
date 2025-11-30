@@ -3,14 +3,21 @@ import type { Project, MemoryEntry } from '@/types/project'
 
 /**
  * Get all projects for the authenticated user
+ * @param toolName - Optional tool name to filter projects by specific tool
  */
-export async function getUserProjects(): Promise<Project[]> {
+export async function getUserProjects(toolName?: string): Promise<Project[]> {
     const supabase = await createClient()
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('projects')
         .select('*')
-        .order('updated_at', { ascending: false })
+
+    // Filter by tool if specified
+    if (toolName) {
+        query = query.eq('tool_name', toolName)
+    }
+
+    const { data, error } = await query.order('updated_at', { ascending: false })
 
     if (error) throw error
     return data || []
@@ -19,7 +26,7 @@ export async function getUserProjects(): Promise<Project[]> {
 /**
  * Create a new project
  */
-export async function createProject(title: string, description?: string): Promise<Project> {
+export async function createProject(title: string, toolName: string, description?: string): Promise<Project> {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -30,12 +37,19 @@ export async function createProject(title: string, description?: string): Promis
         .insert({
             user_id: user.id,
             title,
+            tool_name: toolName,
             description
         })
         .select()
         .single()
 
-    if (error) throw error
+    if (error) {
+        // Check if it's a unique constraint violation
+        if (error.code === '23505') {
+            throw new Error(`A project named "${title}" already exists for this tool`)
+        }
+        throw error
+    }
     return data
 }
 
@@ -91,17 +105,27 @@ export async function deleteProject(projectId: string): Promise<void> {
 
 /**
  * Get project memory (conversation history)
+ * @param projectId - The project ID
+ * @param options - Optional filters: toolName to filter by specific tool, limit for max entries
  */
 export async function getProjectMemory(
     projectId: string,
-    limit: number = 10
+    options?: { toolName?: string; limit?: number }
 ): Promise<MemoryEntry[]> {
     const supabase = await createClient()
+    const limit = options?.limit ?? 10
 
-    const { data, error } = await supabase
+    let query = supabase
         .from('project_memory')
         .select('*')
         .eq('project_id', projectId)
+
+    // Filter by tool if specified
+    if (options?.toolName) {
+        query = query.eq('tool_name', options.toolName)
+    }
+
+    const { data, error } = await query
         .order('created_at', { ascending: false })
         .limit(limit)
 
@@ -206,3 +230,54 @@ export async function getProjectStats(projectId: string): Promise<{ messageCount
         lastActivity: latestMessage?.created_at || null
     }
 }
+
+/**
+ * Get tool-specific statistics for a project
+ * Returns usage stats (count, last used) for each tool used in the project
+ */
+export async function getProjectToolStats(
+    projectId: string
+): Promise<Array<{ toolName: string; count: number; lastUsed: string }>> {
+    const supabase = await createClient()
+
+    // Get all memory entries for this project
+    const { data: memories, error } = await supabase
+        .from('project_memory')
+        .select('tool_name, created_at')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false })
+
+    if (error) throw error
+    if (!memories || memories.length === 0) return []
+
+    // Group by tool_name and calculate stats
+    const toolStatsMap = new Map<string, { count: number; lastUsed: string }>()
+
+    for (const memory of memories) {
+        const toolName = memory.tool_name || 'unknown'
+        const existing = toolStatsMap.get(toolName)
+
+        if (existing) {
+            existing.count++
+            // Keep the latest timestamp
+            if (new Date(memory.created_at) > new Date(existing.lastUsed)) {
+                existing.lastUsed = memory.created_at
+            }
+        } else {
+            toolStatsMap.set(toolName, {
+                count: 1,
+                lastUsed: memory.created_at
+            })
+        }
+    }
+
+    // Convert map to array and sort by last used (most recent first)
+    return Array.from(toolStatsMap.entries())
+        .map(([toolName, stats]) => ({
+            toolName,
+            count: stats.count,
+            lastUsed: stats.lastUsed
+        }))
+        .sort((a, b) => new Date(b.lastUsed).getTime() - new Date(a.lastUsed).getTime())
+}
+

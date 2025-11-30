@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { notFound, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { GradientBackgroundWrapper } from '@/components/ui/GradientBackgroundWrapper'
-import { AnimatedNavbar } from '@/components/ui/AnimatedNavbar'
 import { GlassPanel } from '@/components/ui/GlassPanel'
 import { ChatMemoryPanel } from '@/components/ui/ChatMemoryPanel'
 import { ToolDrawer } from '@/components/ui/ToolDrawer'
@@ -130,9 +129,7 @@ export default function WorkspacePage() {
 
     return (
         <GradientBackgroundWrapper variant="blue">
-            <AnimatedNavbar />
-
-            <div className="min-h-screen pt-24 pb-6 px-4">
+            <div className="min-h-screen pt-4 pb-6 px-4">
                 <div className="mx-auto max-w-7xl">
                     {/* Project Header */}
                     <motion.div

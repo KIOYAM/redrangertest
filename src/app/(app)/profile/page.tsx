@@ -3,12 +3,16 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { GlassPanel } from '@/components/ui/GlassPanel'
+import { PageWrapper } from '@/components/ui/PageWrapper'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { toast } from 'sonner'
-import { User, Save } from 'lucide-react'
+import { User, Save, Shield, CheckCircle, XCircle } from 'lucide-react'
 import type { UserProfile, UserType } from '@/types'
 
 const USER_TYPES = [
@@ -88,95 +92,126 @@ export default function ProfilePage() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-center">
-                    <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-                    <p className="text-gray-600">Loading profile...</p>
+            <PageWrapper variant="dark">
+                <div className="flex min-h-screen items-center justify-center">
+                    <div className="text-center">
+                        <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-purple-600" />
+                        <p className="text-gray-400">Loading profile...</p>
+                    </div>
                 </div>
-            </div>
+            </PageWrapper>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-            <div className="mx-auto max-w-3xl px-4 py-12">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-                    <p className="mt-2 text-gray-600">Manage your account settings</p>
-                </div>
+        <PageWrapper variant="gradient" gradientVariant="purple">
+            <div className="mx-auto max-w-3xl px-4 py-12 pt-32">
+                <PageHeader
+                    title="My Profile"
+                    description="Manage your account settings and preferences"
+                    icon={User}
+                    iconColor="text-purple-400"
+                />
 
-                <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-                    <div className="mb-8 flex items-center gap-4">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-100">
-                            <User className="h-10 w-10 text-blue-600" />
+                <GlassPanel className="p-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8 flex items-center gap-4"
+                    >
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-600/20 to-blue-600/20 border border-purple-500/30">
+                            <User className="h-10 w-10 text-purple-400" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-600">Email</p>
-                            <p className="font-medium text-gray-900">{profile?.email}</p>
-                            <p className="text-xs text-gray-400">ID: {profile?.id?.slice(0, 8)}...</p>
+                            <p className="text-sm text-gray-400">Email</p>
+                            <p className="font-medium text-white">{profile?.email}</p>
+                            <p className="text-xs text-gray-500">ID: {profile?.id?.slice(0, 8)}...</p>
                         </div>
-                    </div>
+                    </motion.div>
 
                     <div className="space-y-6">
                         <div>
-                            <Label htmlFor="fullName">Full Name</Label>
+                            <Label htmlFor="fullName" className="text-gray-300">Full Name</Label>
                             <Input
                                 id="fullName"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
                                 placeholder="Enter your full name"
-                                className="mt-2"
+                                className="mt-2 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                             />
                         </div>
 
                         <div>
-                            <Label htmlFor="userType">I am a...</Label>
+                            <Label htmlFor="userType" className="text-gray-300">I am a...</Label>
                             <Select value={userType} onValueChange={(val) => setUserType(val as UserType)}>
-                                <SelectTrigger className="mt-2">
+                                <SelectTrigger className="mt-2 bg-white/5 border-white/10 text-white">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="bg-gray-900 border-gray-700">
                                     {USER_TYPES.map(type => (
-                                        <SelectItem key={type.value} value={type.value}>
+                                        <SelectItem key={type.value} value={type.value} className="text-white">
                                             {type.label}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <p className="mt-2 text-sm text-gray-500">
+                            <p className="mt-2 text-sm text-gray-400">
                                 This helps us customize your experience
                             </p>
                         </div>
 
-                        <div className="rounded-lg bg-gray-50 p-4">
-                            <h3 className="font-medium text-gray-900">Account Status</h3>
-                            <div className="mt-3 space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Role:</span>
-                                    <span className="font-medium capitalize">{profile?.role}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">AI Access:</span>
-                                    <span className={`font-medium ${profile?.can_use_ai ? 'text-green-600' : 'text-gray-400'}`}>
-                                        {profile?.can_use_ai ? 'Enabled' : 'Disabled'}
+                        <GlassPanel hover={false} className="p-6 bg-black/20">
+                            <h3 className="font-medium text-white mb-4 flex items-center gap-2">
+                                <Shield className="h-5 w-5 text-purple-400" />
+                                Account Status
+                            </h3>
+                            <div className="mt-3 space-y-3 text-sm">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-400">Role:</span>
+                                    <span className="font-medium text-white capitalize px-3 py-1 rounded-full bg-purple-600/20 border border-purple-500/30">
+                                        {profile?.role}
                                     </span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Status:</span>
-                                    <span className={`font-medium ${profile?.is_active ? 'text-green-600' : 'text-red-600'}`}>
-                                        {profile?.is_active ? 'Active' : 'Inactive'}
-                                    </span>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-400">AI Access:</span>
+                                    <div className="flex items-center gap-2">
+                                        {profile?.can_use_ai ? (
+                                            <CheckCircle className="h-4 w-4 text-green-400" />
+                                        ) : (
+                                            <XCircle className="h-4 w-4 text-gray-500" />
+                                        )}
+                                        <span className={`font-medium ${profile?.can_use_ai ? 'text-green-400' : 'text-gray-500'}`}>
+                                            {profile?.can_use_ai ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-400">Status:</span>
+                                    <div className="flex items-center gap-2">
+                                        {profile?.is_active ? (
+                                            <CheckCircle className="h-4 w-4 text-green-400" />
+                                        ) : (
+                                            <XCircle className="h-4 w-4 text-red-400" />
+                                        )}
+                                        <span className={`font-medium ${profile?.is_active ? 'text-green-400' : 'text-red-400'}`}>
+                                            {profile?.is_active ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </GlassPanel>
 
-                        <Button onClick={handleSave} disabled={isSaving} className="w-full">
+                        <Button 
+                            onClick={handleSave} 
+                            disabled={isSaving} 
+                            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        >
                             <Save className="mr-2 h-4 w-4" />
                             {isSaving ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>
-                </div>
+                </GlassPanel>
             </div>
-        </div>
+        </PageWrapper>
     )
 }

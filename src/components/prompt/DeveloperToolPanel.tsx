@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { X, Sparkles, Copy, Check, Code2, MessageSquare } from 'lucide-react'
 import { UserProfile } from '@/types'
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
+import { OutOfEnergyModal } from '@/components/credits/OutOfEnergyModal'
 import { toast } from 'sonner'
 
 interface DeveloperToolPanelProps {
@@ -49,6 +50,26 @@ export function DeveloperToolPanel({ user, onClose }: DeveloperToolPanelProps) {
     // Copy state
     const [ideCopied, setIdeCopied] = useState(false)
     const [chatCopied, setChatCopied] = useState(false)
+
+    // Morphin Energy modal state
+    const [showEnergyModal, setShowEnergyModal] = useState(false)
+    const [packages, setPackages] = useState<any[]>([])
+
+    useEffect(() => {
+        fetchPackages()
+    }, [])
+
+    async function fetchPackages() {
+        try {
+            const response = await fetch('/api/credits/packages')
+            if (response.ok) {
+                const data = await response.json()
+                setPackages(data.packages || [])
+            }
+        } catch (error) {
+            console.error('Failed to fetch packages:', error)
+        }
+    }
 
     const handleStackToggle = (tech: string) => {
         setStack(prev =>
@@ -102,6 +123,12 @@ export function DeveloperToolPanel({ user, onClose }: DeveloperToolPanelProps) {
                 }
                 if (response.status === 403) {
                     throw new Error('AI access is not enabled for your account')
+                }
+                if (response.status === 402) {
+                    // Out of Morphin Energy!
+                    setShowEnergyModal(true)
+                    setIsLoading(false)
+                    return
                 }
                 throw new Error(errorData.error || 'Failed to generate prompts')
             }
@@ -453,6 +480,14 @@ export function DeveloperToolPanel({ user, onClose }: DeveloperToolPanelProps) {
                     </div>
                 </div>
             </motion.div>
+
+            {/* Out of Morphin Energy Modal */}
+            <OutOfEnergyModal
+                isOpen={showEnergyModal}
+                onClose={() => setShowEnergyModal(false)}
+                userEmail={user?.email}
+                packages={packages}
+            />
         </>
     )
 }

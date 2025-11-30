@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { GlassPanel } from '@/components/ui/GlassPanel'
+import { PageWrapper } from '@/components/ui/PageWrapper'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { toast } from 'sonner'
-import { UserCircle, ArrowRight } from 'lucide-react'
+import { UserCircle, ArrowRight, Sparkles } from 'lucide-react'
 import type { UserType } from '@/types'
 
 const USER_TYPES = [
@@ -63,71 +66,80 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-            <div className="w-full max-w-2xl">
-                <div className="mb-8 text-center">
-                    <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-blue-600">
-                        <UserCircle className="h-12 w-12 text-white" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Welcome to PromptGen! 👋</h1>
-                    <p className="mt-2 text-gray-600">Let's set up your profile to get started</p>
-                </div>
+        <PageWrapper variant="gradient" gradientVariant="purple">
+            <div className="flex min-h-screen items-center justify-center p-4">
+                <div className="w-full max-w-2xl">
+                    <PageHeader
+                        title="Welcome to RedRanger! 👋"
+                        description="Let's set up your profile to get started"
+                        icon={UserCircle}
+                        iconColor="text-purple-400"
+                    />
 
-                <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-                    <div className="space-y-6">
-                        <div>
-                            <Label htmlFor="fullName">What's your name? *</Label>
-                            <Input
-                                id="fullName"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                placeholder="Enter your full name"
-                                className="mt-2"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <Label>I am a... *</Label>
-                            <div className="mt-2 grid gap-3 sm:grid-cols-2">
-                                {USER_TYPES.map((type) => (
-                                    <button
-                                        key={type.value}
-                                        type="button"
-                                        onClick={() => setUserType(type.value as UserType)}
-                                        className={`rounded-lg border-2 p-4 text-left transition-all ${userType === type.value
-                                                ? 'border-blue-600 bg-blue-50'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                            }`}
-                                    >
-                                        <div className="font-medium text-gray-900">{type.label}</div>
-                                        <div className="mt-1 text-sm text-gray-600">{type.desc}</div>
-                                    </button>
-                                ))}
+                    <GlassPanel className="p-8">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <Label htmlFor="fullName" className="text-gray-300">What's your name? *</Label>
+                                <Input
+                                    id="fullName"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    placeholder="Enter your full name"
+                                    className="mt-2 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                                    required
+                                />
                             </div>
-                        </div>
 
-                        <div>
-                            <Label htmlFor="jobRole">Job Role or Title (optional)</Label>
-                            <Input
-                                id="jobRole"
-                                value={jobRole}
-                                onChange={(e) => setJobRole(e.target.value)}
-                                placeholder="e.g., Frontend Developer, Marketing Manager"
-                                className="mt-2"
-                            />
-                            <p className="mt-1 text-sm text-gray-500">
-                                This helps us personalize your AI prompts
-                            </p>
-                        </div>
+                            <div>
+                                <Label className="text-gray-300">I am a... *</Label>
+                                <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                                    {USER_TYPES.map((type, index) => (
+                                        <motion.button
+                                            key={type.value}
+                                            type="button"
+                                            onClick={() => setUserType(type.value as UserType)}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            className={`rounded-lg border-2 p-4 text-left transition-all ${userType === type.value
+                                                    ? 'border-purple-500 bg-purple-600/20 shadow-lg shadow-purple-500/20'
+                                                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                                                }`}
+                                        >
+                                            <div className="font-medium text-white">{type.label}</div>
+                                            <div className="mt-1 text-sm text-gray-400">{type.desc}</div>
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            </div>
 
-                        <Button type="submit" disabled={isLoading} className="w-full" size="lg">
-                            {isLoading ? 'Setting up...' : 'Continue to PromptGen'}
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                    </div>
-                </form>
+                            <div>
+                                <Label htmlFor="jobRole" className="text-gray-300">Job Role or Title (optional)</Label>
+                                <Input
+                                    id="jobRole"
+                                    value={jobRole}
+                                    onChange={(e) => setJobRole(e.target.value)}
+                                    placeholder="e.g., Frontend Developer, Marketing Manager"
+                                    className="mt-2 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                                />
+                                <p className="mt-1 text-sm text-gray-400">
+                                    This helps us personalize your AI prompts
+                                </p>
+                            </div>
+
+                            <Button 
+                                type="submit" 
+                                disabled={isLoading} 
+                                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                                size="lg"
+                            >
+                                {isLoading ? 'Setting up...' : 'Continue to RedRanger'}
+                                <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </form>
+                    </GlassPanel>
+                </div>
             </div>
-        </div>
+        </PageWrapper>
     )
 }

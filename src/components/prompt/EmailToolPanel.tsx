@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { X, ChevronDown, ChevronUp, Sparkles, Mail, Reply, Copy, Check } from 'lucide-react'
 import { UserProfile } from '@/types'
@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ModeToggle } from './ModeToggle'
 import { OutputPanel } from './OutputPanel'
+import { CreateProjectDialog } from './CreateProjectDialog'
 import { toast } from 'sonner'
 import { buildEmailPrompt } from '@/lib/tools/email/email-prompt-engine'
 
@@ -64,6 +65,47 @@ export function EmailToolPanel({ user, onClose }: EmailToolPanelProps) {
     const [emailError, setEmailError] = useState<string | null>(null)
     const [emailCopied, setEmailCopied] = useState(false)
 
+    // ========== PROJECT SELECTOR STATE ==========
+    const [projects, setProjects] = useState<any[]>([])
+    const [selectedProjectId, setSelectedProjectId] = useState<string>('NONE')
+    const [isLoadingProjects, setIsLoadingProjects] = useState(false)
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+
+    // Load projects on mount
+    useEffect(() => {
+        loadProjects()
+    }, [])
+
+    async function loadProjects() {
+        setIsLoadingProjects(true)
+        try {
+            // Filter projects by 'email' tool
+            const response = await fetch('/api/projects/list?toolName=email')
+            if (response.ok) {
+                const data = await response.json()
+                setProjects(data.projects || [])
+            }
+        } catch (error) {
+            console.error('Failed to load projects:', error)
+        } finally {
+            setIsLoadingProjects(false)
+        }
+    }
+
+    const handleProjectCreated = (project: any) => {
+        // Add to projects list and select it
+        setProjects(prev => [project, ...prev])
+        setSelectedProjectId(project.id)
+    }
+
+    const handleProjectSelect = (value: string) => {
+        if (value === 'CREATE_NEW') {
+            setIsCreateDialogOpen(true)
+        } else {
+            setSelectedProjectId(value)
+        }
+    }
+
     const toneChips: Array<{ value: Tone | 'custom', label: string }> = [
         { value: 'formal', label: 'Very Formal' },
         { value: 'semi_formal', label: 'Professional' },
@@ -98,7 +140,12 @@ export function EmailToolPanel({ user, onClose }: EmailToolPanelProps) {
                         story,
                         tone: effectiveTone,
                         length,
-                        language
+                        language,
+                        // Project memory integration
+                        ...(selectedProjectId && {
+                            projectId: selectedProjectId,
+                            toolName: 'email'
+                        })
                     }),
                 })
 
@@ -319,6 +366,32 @@ export function EmailToolPanel({ user, onClose }: EmailToolPanelProps) {
 
                                     {/* Simple Section */}
                                     <div className="space-y-4">
+                                        {/* Project Selector */}
+                                        <div>
+                                            <Label className="text-sm font-medium">Attach to Project (Optional)</Label>
+                                            <Select value={selectedProjectId} onValueChange={handleProjectSelect}>
+                                                <SelectTrigger className="mt-2">
+                                                    <SelectValue placeholder={isLoadingProjects ? "Loading projects..." : "No project (Quick use)"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="NONE">No project (Quick use)</SelectItem>
+                                                    <SelectItem value="CREATE_NEW" className="font-medium text-blue-600">
+                                                        + Create New Project
+                                                    </SelectItem>
+                                                    {projects.map((project) => (
+                                                        <SelectItem key={project.id} value={project.id}>
+                                                            {project.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            {selectedProjectId && selectedProjectId !== 'NONE' && (
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    💡 This will save to project memory for context in future emails
+                                                </p>
+                                            )}
+                                        </div>
+
                                         {/* Story Input */}
                                         <div>
                                             <Label htmlFor="story" className="text-sm font-medium">
@@ -719,6 +792,15 @@ export function EmailToolPanel({ user, onClose }: EmailToolPanelProps) {
                     </Tabs>
                 </div>
             </motion.div>
+
+            {/* Create Project Dialog */}
+            <CreateProjectDialog
+                toolName="email"
+                toolDisplayName="Email"
+                isOpen={isCreateDialogOpen}
+                onClose={() => setIsCreateDialogOpen(false)}
+                onProjectCreated={handleProjectCreated}
+            />
         </>
     )
 }

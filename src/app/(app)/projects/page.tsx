@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { GradientBackgroundWrapper } from '@/components/ui/GradientBackgroundWrapper'
-import { AnimatedNavbar } from '@/components/ui/AnimatedNavbar'
+import { PageWrapper } from '@/components/ui/PageWrapper'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { ProjectCard } from '@/components/ui/ProjectCard'
 import { FloatingCreateButton } from '@/components/ui/FloatingCreateButton'
 import { GlassPanel } from '@/components/ui/GlassPanel'
@@ -71,36 +71,16 @@ export default function ProjectsPage() {
     }
 
     return (
-        <GradientBackgroundWrapper variant="purple">
-            <AnimatedNavbar />
-
+        <PageWrapper variant="gradient" gradientVariant="purple">
             <div className="min-h-screen pt-32 pb-20 px-4">
                 <div className="mx-auto max-w-7xl">
                     {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-12 text-center"
-                    >
-                        <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", duration: 0.6 }}
-                            className="mb-4 inline-flex"
-                        >
-                            <div className="rounded-full bg-gradient-to-r from-purple-600 to-blue-600 p-4 shadow-lg shadow-purple-500/50">
-                                <Sparkles className="h-8 w-8 text-white" />
-                            </div>
-                        </motion.div>
-
-                        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                            Your AI Projects
-                        </h1>
-
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            Each project has its own isolated AI memory. Create, manage, and organize your AI workflows.
-                        </p>
-                    </motion.div>
+                    <PageHeader
+                        title="Your AI Projects"
+                        description="Each project has its own isolated AI memory. Create, manage, and organize your AI workflows."
+                        icon={Sparkles}
+                        iconColor="text-purple-400"
+                    />
 
                     {/* Create Button */}
                     <motion.div
@@ -223,6 +203,6 @@ export default function ProjectsPage() {
                     </motion.div>
                 </DialogContent>
             </Dialog>
-        </GradientBackgroundWrapper>
+        </PageWrapper>
     )
 }

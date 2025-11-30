@@ -5,85 +5,85 @@ import { ReactNode } from 'react'
 
 interface GradientBackgroundWrapperProps {
     children: ReactNode
-    variant?: 'default' | 'purple' | 'blue' | 'teal'
+    variant?: 'default' | 'purple' | 'blue' | 'teal' | 'cyan'
 }
 
 export function GradientBackgroundWrapper({
     children,
     variant = 'default'
 }: GradientBackgroundWrapperProps) {
-    const gradients = {
-        default: 'from-gray-950 via-gray-900 to-black',
-        purple: 'from-purple-950 via-gray-900 to-black',
-        blue: 'from-blue-950 via-gray-900 to-black',
-        teal: 'from-teal-950 via-gray-900 to-black'
+    const getGradient = () => {
+        switch (variant) {
+            case 'purple':
+                return 'from-purple-900/20 via-black to-purple-900/20'
+            case 'blue':
+                return 'from-blue-900/20 via-black to-blue-900/20'
+            case 'teal':
+                return 'from-teal-900/20 via-black to-teal-900/20'
+            case 'cyan':
+                return 'from-cyan-900/20 via-black to-cyan-900/20'
+            default:
+                return 'from-gray-900/20 via-black to-gray-900/20'
+        }
+    }
+
+    const getAccentColor = () => {
+        switch (variant) {
+            case 'purple':
+                return 'rgba(139, 92, 246, 0.15)'
+            case 'blue':
+                return 'rgba(59, 130, 246, 0.15)'
+            case 'teal':
+                return 'rgba(20, 184, 166, 0.15)'
+            case 'cyan':
+                return 'rgba(6, 182, 212, 0.15)'
+            default:
+                return 'rgba(100, 100, 100, 0.15)'
+        }
     }
 
     return (
-        <div className={`relative min-h-screen bg-gradient-to-br ${gradients[variant]} overflow-hidden`}>
-            {/* Animated gradient orbs */}
-            <motion.div
-                className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"
-                animate={{
-                    x: [0, 100, 0],
-                    y: [0, -100, 0],
-                    scale: [1, 1.2, 1],
-                }}
-                transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
-            />
-
-            <motion.div
-                className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"
-                animate={{
-                    x: [0, -100, 0],
-                    y: [0, 100, 0],
-                    scale: [1, 1.3, 1],
-                }}
-                transition={{
-                    duration: 25,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
-            />
-
-            <motion.div
-                className="absolute top-1/2 left-1/2 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl"
-                animate={{
-                    x: [-50, 50, -50],
-                    y: [-50, 50, -50],
-                    scale: [1, 1.1, 1],
-                }}
-                transition={{
-                    duration: 30,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                }}
-            />
-
-            {/* Floating particles */}
-            {[...Array(20)].map((_, i) => (
+        <div className={`relative min-h-screen bg-gradient-to-br ${getGradient()}`}>
+            {/* Animated orbs */}
+            <div className="absolute inset-0 overflow-hidden">
                 <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 bg-white/30 rounded-full"
-                    style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                    }}
+                    className="absolute -top-20 -right-20 h-96 w-96 rounded-full blur-3xl"
+                    style={{ background: getAccentColor() }}
                     animate={{
-                        y: [0, -30, 0],
-                        opacity: [0.3, 0.8, 0.3],
+                        scale: [1, 1.2, 1],
+                        x: [0, 50, 0],
+                        y: [0, 30, 0]
                     }}
                     transition={{
-                        duration: 3 + Math.random() * 2,
+                        duration: 20,
                         repeat: Infinity,
-                        delay: Math.random() * 2,
+                        ease: "easeInOut"
                     }}
                 />
-            ))}
+                <motion.div
+                    className="absolute -bottom-20 -left-20 h-96 w-96 rounded-full blur-3xl"
+                    style={{ background: getAccentColor() }}
+                    animate={{
+                        scale: [1.2, 1, 1.2],
+                        x: [0, -50, 0],
+                        y: [0, -30, 0]
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                />
+            </div>
+
+            {/* Grid pattern */}
+            <div
+                className="absolute inset-0 opacity-20"
+                style={{
+                    backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
+                    backgroundSize: '40px 40px'
+                }}
+            />
 
             {/* Content */}
             <div className="relative z-10">
