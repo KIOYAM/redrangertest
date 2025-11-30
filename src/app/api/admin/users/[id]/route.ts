@@ -126,40 +126,6 @@ export async function PATCH(
         }
 
         return NextResponse.json({ profile })
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-}
-
-export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check if requester is admin
-    const { data: requesterProfile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-    if (requesterProfile?.role !== 'admin') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', params.id)
-        .single()
-
-    if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
