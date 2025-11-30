@@ -5,10 +5,47 @@ import { NextResponse } from 'next/server'
 // Super Admin - NEVER allow modification or deletion
 const SUPER_ADMIN_EMAIL = 'kannansin784yg0@gmail.com'
 
+export async function GET(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id } = await params
+    const supabase = await createClient()
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get user profile
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+    // Get user stats
+    const { count: projectCount } = await supabase
+        .from('projects')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', id)
+
+    return NextResponse.json({
+        profile,
+        stats: {
+            projectCount: projectCount || 0,
+        },
+    })
+}
+
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -32,7 +69,7 @@ export async function DELETE(
         const { data: targetProfile } = await supabase
             .from('profiles')
             .select('email')
-            .eq('id', params.id)
+            .eq('id', id)
             .single()
 
         if (targetProfile?.email === SUPER_ADMIN_EMAIL) {
@@ -43,7 +80,7 @@ export async function DELETE(
         }
 
         // Prevent self-deletion
-        if (params.id === user.id) {
+        if (id === user.id) {
             return NextResponse.json(
                 { error: 'Cannot delete your own account' },
                 { status: 400 }
@@ -51,7 +88,7 @@ export async function DELETE(
         }
 
         // Hard delete user from auth.users using admin client
-        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(params.id)
+        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id)
 
         if (authError) {
             console.error('Auth delete error:', authError)
@@ -69,8 +106,9 @@ export async function DELETE(
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -96,7 +134,7 @@ export async function PATCH(
         const { data: targetProfile } = await supabase
             .from('profiles')
             .select('email')
-            .eq('id', params.id)
+            .eq('id', id)
             .single()
 
         if (targetProfile?.email === SUPER_ADMIN_EMAIL && updates.role && updates.role !== 'admin') {
@@ -107,7 +145,7 @@ export async function PATCH(
         }
 
         // Prevent changing own admin status
-        if (params.id === user.id && updates.role && updates.role !== 'admin') {
+        if (id === user.id && updates.role && updates.role !== 'admin') {
             return NextResponse.json(
                 { error: 'Cannot remove your own admin role' },
                 { status: 400 }
@@ -117,7 +155,7 @@ export async function PATCH(
         const { data: profile, error } = await supabase
             .from('profiles')
             .update(updates)
-            .eq('id', params.id)
+            .eq('id', id)
             .select()
             .single()
 
@@ -126,19 +164,7 @@ export async function PATCH(
         }
 
         return NextResponse.json({ profile })
+    } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
-
-    // Get project count
-    const { count } = await supabase
-        .from('projects')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', params.id)
-
-    return NextResponse.json({
-        profile,
-        stats: {
-            projectCount: count || 0
-        }
-    })
 }
